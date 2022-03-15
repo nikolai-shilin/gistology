@@ -74,7 +74,7 @@ async function getWorksheetsWithNonNullReactionsFromDB() {
 /**
  * update worksheet reactions by workshhet id
  */
-async function updateWorksheetReactionsInDB(worksheet) {
+async function saveWorksheetReactionsInDB(worksheet) {
   // mock
   return Promise.resolve({ success: true });
   // not mock
@@ -146,7 +146,7 @@ getWorksheetsWithNonNullReactionsFromDB()
       if (isMigrationRequired(worksheet)) {
         let uniqueReactions = getUniqueUserReactions(worksheet.reactions);
         worksheet.reactions = await enhanceReactions(uniqueReactions);
-        await updateWorksheetReactionsInDB(worksheet);
+        await saveWorksheetReactionsInDB(worksheet);
       }
     }
     console.log(JSON.stringify(worksheets));
