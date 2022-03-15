@@ -1,0 +1,25 @@
+{
+  "name": "temp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "reactions-migration.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikolai-shilin/gistology.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nikolai-shilin/gistology/issues"
+  },
+  "homepage": "https://github.com/nikolai-shilin/gistology#readme",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "object-sizeof": "^1.6.3",
+    "pg": "^8.7.3"
+  }
+}
