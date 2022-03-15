@@ -35,7 +35,6 @@ const worksheetsMock = [
   },
 ];
 
-
 /**
  * get user by id from db
  */
@@ -44,13 +43,19 @@ async function getUserFromDB(userId) {
   return Promise.resolve({
     id: userId,
     imagePath: `http://s3.smth.com/image-${userId}.url`,
-    firstName: "Alan",
-    lastName: "Gate",
+    firstName: ["Alan", "Zoe", 'Ivan', 'Derek', 'Dan'][Math.floor(5 * Math.random())],
+    lastName: ["Brown", "Mitch", 'Silverstone', 'Flint', 'Reynolds'][Math.floor(5 * Math.random())],
   });
   // not mock
-  // return await knex
-  //   .select("id", "first_name,", "last_name", "image_path")
-  //   .from("us_user");
+//   return await knex
+//     .select("id", "first_name,", "last_name", "image_path")
+//     .from("us_user")
+//     .where({ id: userId })
+//     .map((rawUserRecord) => ({
+//         firstName: rawUserRecord.first_name,
+//         lastName: rawUserRecord.last_name,
+//         imagePath: rawUserRecord.image_path,
+//     }));
 }
 
 /**
@@ -79,7 +84,7 @@ async function updateWorksheetReactionsInDB(worksheet) {
 }
 
 /**
- * returns the list of the last reactions for every user
+ * returns the list of the last pushed reactions for every user
  * with reaction order preservation
  */
 function getUniqueUserReactions(reactions) {
@@ -97,24 +102,24 @@ function getUniqueUserReactions(reactions) {
 /**
  * enhance previos reaction records with additional data from user
  */
-async function enhanceReactionsWithUserData(reactions) {
+async function enhanceReactions(reactions) {
   for await (let reaction of reactions) {
     let user = await getUserFromDB(reaction.userId);
-    reaction = enhanceReactionData(reaction, user);
+    reaction = enhanceReaction(reaction, user);
   }
   return reactions;
 }
 
 /**
- * enhance previos reaction record with additional data from user
+ * enhance previos reaction record with additional data from user, date
  */
-function enhanceReactionData(reaction, user) {
+function enhanceReaction(reaction, user) {
   let { imagePath, firstName, lastName } = user;
   return Object.assign(reaction, {
     imagePath,
     firstName,
     lastName,
-    date: Date.now()
+    date: Date.now(),
   });
 }
 
@@ -122,18 +127,15 @@ function enhanceReactionData(reaction, user) {
  * cases when we dont need a migration of reactions list
  */
 function isMigrationRequired(worksheet) {
-    let reactions = worksheet.reactions;
-    //  null case
-    if (reactions === null) {
-      return false;
-    }
-    // empty list case
-    if (Array.isArray(reactions) && !reactions.length) {
-      return false;
-    }
-    return true;
+  let reactions = worksheet.reactions;
+  if (reactions === null) {
+    return false;
   }
-
+  if (Array.isArray(reactions) && !reactions.length) {
+    return false;
+  }
+  return true;
+}
 
 /**
  * main
@@ -143,9 +145,7 @@ getWorksheetsWithNonNullReactionsFromDB()
     for await (let worksheet of worksheets) {
       if (isMigrationRequired(worksheet)) {
         let uniqueReactions = getUniqueUserReactions(worksheet.reactions);
-        worksheet.reactions = await enhanceReactionsWithUserData(
-          uniqueReactions
-        );
+        worksheet.reactions = await enhanceReactions(uniqueReactions);
         await updateWorksheetReactionsInDB(worksheet);
       }
     }
@@ -154,4 +154,3 @@ getWorksheetsWithNonNullReactionsFromDB()
   .catch((err) => {
     console.log(err);
   });
-
