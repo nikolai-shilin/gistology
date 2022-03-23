@@ -27,13 +27,10 @@ const getFilterData = (userGroups, worksheetWidgetGroups, userAttributesMap) => 
   return filtersData;
 }
 
-const mapAttributesArrayToObject = (attributesArray) => {
-  const attrMap = {};
-  attributesArray.forEach((attr) => {
-    attrMap[attr.id] = attr;
-  });
-  return attrMap;
-}
+const mapAttributesArrayToObject = (attributes) =>
+   attributes.reduce((result, attribute) => 
+     Object.assign(result, { [attribute.id]: attribute })
+   , {});
 
 
 const getWorksheetWidgetGroups = (worksheet) => {
